@@ -3,9 +3,15 @@ import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import cloudinary from "../config/cloudinary";
 import { prisma } from "../server";
 import fs from "fs";
-import { Prisma } from "@prisma/client";
 import { sendEmail } from "../utils/sendEmail";
 
+type NewsletterRecipient = {
+  email: string;
+};
+
+type ReviewRating = {
+  rating: number;
+};
 export const createProduct = async (req: any, res: Response) => {
   try {
     const {
@@ -56,7 +62,7 @@ export const createProduct = async (req: any, res: Response) => {
     files.forEach((file) => fs.unlinkSync(file.path));
 
     // Fetch all subscribers
-    const subscribers = await prisma.newsletter.findMany();
+    const subscribers: NewsletterRecipient[] = await prisma.newsletter.findMany();
 
     // Email content
     const subject = `New Product Added: ${name}`;
@@ -376,7 +382,7 @@ export const addProductReview = async (
     }
 
     // ✅ Recalculate product average rating
-    const reviews = await prisma.review.findMany({
+    const reviews: ReviewRating[] = await prisma.review.findMany({
       where: { productId },
       select: { rating: true },
     });
@@ -412,3 +418,4 @@ export const addProductReview = async (
     }
   }
 };
+

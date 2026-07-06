@@ -157,18 +157,20 @@ async function setTokens(
   refreshToken: string,
   userId?: string
 ) {
+  const isProd = process.env.NODE_ENV === "production";
+
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     path: "/",
     maxAge: 60 * 60 * 1000,
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
@@ -183,6 +185,7 @@ async function setTokens(
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log("register called");
     const { name, email, password } = req.body;
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {

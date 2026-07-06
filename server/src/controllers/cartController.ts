@@ -2,6 +2,13 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { prisma } from "../server";
 
+type CartItemSummary = {
+  id: string;
+  productId: string;
+  color: string | null;
+  size: string | null;
+  quantity: number;
+};
 export const addToCart = async (
   req: AuthenticatedRequest,
   res: Response
@@ -127,7 +134,7 @@ export const getCart = async (
     }
 
     const cartItemsWithProducts = await Promise.all(
-      cart?.items.map(async (item) => {
+      cart?.items.map(async (item: CartItemSummary) => {
         const product = await prisma.product.findUnique({
           where: { id: item.productId },
           select: {
@@ -293,3 +300,4 @@ export const clearEntireCart = async (
     });
   }
 };
+

@@ -1,4 +1,7 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ;
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiBaseUrl = rawApiUrl && rawApiUrl !== "undefined" ? rawApiUrl : "http://localhost:3001";
+
+export const API_BASE_URL = apiBaseUrl.replace(/\/$/, "");
 
 export const API_ROUTES = {
   AUTH: `${API_BASE_URL}/api/auth`,

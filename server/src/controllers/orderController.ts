@@ -3,7 +3,7 @@ import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { NextFunction, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../server";
-
+import type { Prisma } from "@prisma/client";
 const CHAPA_SECRET_KEY = process.env.CHAPA_SECRET_KEY;
 const CHAPA_API_URL = "https://api.chapa.co/v1/transaction/verify";
 
@@ -198,7 +198,7 @@ export const createOrder = async (
       return;
     }
 
-    const order = await prisma.$transaction(async (prisma) => {
+    const order = await prisma.$transaction(async (prisma: Prisma.TransactionClient) => {
       const newOrder = await prisma.order.create({
         data: {
           userId,
@@ -429,3 +429,4 @@ export const getOrdersByUserId = async (
     });
   }
 };
+

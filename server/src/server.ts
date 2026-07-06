@@ -2,6 +2,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { PrismaClient } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -15,6 +18,9 @@ import orderRoutes from "./routes/orderRoutes";
 import messageRoutes from "./routes/messageRoutes";
 import newsletterRoutes from "./routes/newsLetterRoutes";
 import paymentRoutes from "./routes/paymentRoutes";
+
+// Use WebSocket so Prisma connects over port 443 (bypasses firewall blocks on port 5432)
+neonConfig.webSocketConstructor = ws;
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -40,7 +46,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-export const prisma = new PrismaClient();
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
+export const prisma = new PrismaClient({ adapter } as any);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);

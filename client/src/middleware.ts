@@ -4,6 +4,8 @@ import { jwtVerify } from "jose";
 const publicRoutes = ["/auth/register", "/auth/login"];
 const superAdminRoutes = ["/super-admin", "/super-admim/:path*"];
 const userRoutes = ["/home", "/account", "/cart", "/checkout", "/listing"];
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL;
+const apiBaseUrl = rawApiUrl && rawApiUrl !== "undefined" ? rawApiUrl : "http://localhost:3001";
 
 export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
@@ -47,10 +49,13 @@ export async function middleware(request: NextRequest) {
     } catch (e) {
       console.error("Token verification failed", e);
       const refreshResponse = await fetch(
-        "http://localhost:3000/api/auth/refresh-token",
+        `${apiBaseUrl}/api/auth/refresh-token`,
         {
           method: "POST",
           credentials: "include",
+          headers: {
+            Cookie: request.headers.get("cookie") ?? "",
+          },
         }
       );
 
